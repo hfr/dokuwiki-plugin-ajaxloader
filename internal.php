@@ -128,6 +128,7 @@ switch ($call) {
         $loggedIn=false;
         try {
             session_write_close();
+            $_SESSION = [];
             $token = $_REQUEST['token'] ?? [];
             $session_tok = $token['session'] ?? '';
             if (!empty($session_tok)) {
@@ -142,12 +143,16 @@ switch ($call) {
                 init_session();
                 if (isset($_SESSION[DOKU_COOKIE])) {
                     $authData = $_SESSION[DOKU_COOKIE]['auth'] ?? [];
-                    if (!empty($authData)) {
-                        $loggedIn=auth_login('', '');
-                    }
                     $authInfo = $authData['info'] ?? [];
                     $user = $authData['user'] ?? '';
                     $grps = $authInfo['grps'] ?? [];
+                    if (!empty($authData) && isset($authData['time'])) {
+                        $loggedIn=auth_login('', '');
+                    } elseif (isset($authData['token'])) {
+                        $user = '';
+                        $grps = [];
+                        $session_tok = '';
+                    }
                     $pageId = cleanID($_REQUEST['id'] ?? '');
                     if ($pageId !== '') {
                         $acl = (int) auth_aclcheck($pageId, $user, $grps);
@@ -160,6 +165,8 @@ switch ($call) {
             $acl = 0;
         }
 
+    session_write_close();
+    
     $respond([
         'session' => $session_tok,
         'id' => $pageId,
@@ -185,6 +192,8 @@ switch ($call) {
         foreach ($tokens as $token) {
 
             session_write_close();
+            $_SESSION = [];
+
             $session_tok = $token['session'] ?? '';
             $session_data = [];
             if (!empty($session_tok)) {
@@ -197,11 +206,11 @@ switch ($call) {
                 }
                 session_id($session_tok);
                 init_session();
-                print_r($_SESSION);
                 if (isset($_SESSION[DOKU_COOKIE])) {
                     $session_data[]='valid';
                 }
-                if (isset($_SESSION[DOKU_COOKIE]['auth'])) {
+                $authData = $_SESSION[DOKU_COOKIE]['auth'] ?? [];
+                if (!empty($authData) && isset($authData['time'])) {
                     $loggedin=auth_login('', '');
                     if ($loggedin) {
                         $session_data[]='authentic';
