@@ -26,6 +26,7 @@ else if(isset($_GET['call']))
 else
   exit;
 
+include 'internal.php';
 
 include 'common.php';
 

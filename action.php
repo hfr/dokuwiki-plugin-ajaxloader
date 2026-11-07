@@ -27,6 +27,8 @@ class action_plugin_ajaxloader extends ActionPlugin
     {
         $call = $event->data;
 
+        include __DIR__ . '/internal.php';
+
         require __DIR__ . '/common.php';
     }
 }
