@@ -227,14 +227,15 @@ switch ($call) {
 
         break;
 
-    case 'get_doku_cookie':
+    case 'get_doku_cookies':
 
         [$allowed, $error, $status] = $isApiAdmin();
         if (!$allowed) {
             $respond(['error' => $error], $status);
         }
         $respond([
-            'doku_cookie' => DOKU_COOKIE
+            'doku_cookie' => DOKU_COOKIE,
+            'doku_session_name' => DOKU_SESSION_NAME
         ]);
  
         break;
